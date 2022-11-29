@@ -1,0 +1,17 @@
+name: face-search
+channels:
+  - conda-forge
+  - nvidia
+  - pytorch
+dependencies:
+  - conda-forge::gdown
+  - conda-forge::jupyterlab
+  - conda-forge::ipywidgets
+  - conda-forge::onnxruntime
+  - conda-forge::opencv
+  - conda-forge::python
+  - conda-forge::scikit-learn
+  - conda-forge::tqdm
+  - pytorch::pytorch-cuda=11.7
+  - pytorch::pytorch
+  - pytorch::torchvision
