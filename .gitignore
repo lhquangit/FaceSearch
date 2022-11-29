@@ -2,7 +2,6 @@
 .ipynb_checkpoints/
 __pycache__/
 flagged/
-test.ipynb
 *.onnx
 *.pth
 *.tar
