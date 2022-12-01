@@ -11,16 +11,13 @@ DEVICE = "cuda" if IS_CUDA_AVAILABLE else "cpu"
 
 
 @towhee.register("extract_fields")
-def extract_fields(path: str) -> tuple[str, str, str, bool, bool]:
+def extract_fields(path: str) -> tuple[str, str, str]:
     dir_name = Path(path).parent.name
     fields = re.fullmatch(r"(.*) - (.*) - (.*)", dir_name)
     company = fields.group(1)  # type: ignore
     name = fields.group(2)  # type: ignore
     position = fields.group(3)  # type: ignore
-    lead = "Lead" in position
-    intern = "Intern" in position
-    position = position.replace("Lead", "").replace("Intern", "").strip()
-    return company, name, position, lead, intern
+    return company, name, position
 
 
 def main() -> None:
@@ -33,7 +30,7 @@ def main() -> None:
     ) 
 
     for sample in dataset:
-        print(f"{sample.company:<15}{sample.name:<25}{sample.position:<20}{sample.lead:<5}{sample.intern:<5}")
+        print(f"{sample.company:<15}{sample.name:<25}{sample.position}")
     
 
 if __name__ == '__main__':
