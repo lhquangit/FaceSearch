@@ -1,7 +1,9 @@
 .idea/
 .ipynb_checkpoints/
 __pycache__/
+datasets/
 flagged/
+venv/
 *.onnx
 *.pth
 *.tar
