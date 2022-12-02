@@ -3,7 +3,9 @@ from pathlib import Path
 
 import towhee
 
-DATA_DIR = Path("data/rikai/")
+import embedding
+
+DATASET = Path("dataset/rikai/")
 
 
 @towhee.register("extract_fields")
@@ -19,15 +21,16 @@ def extract_fields(path: str) -> tuple[str, str, str]:
 def main() -> None:
 
     dataset = (
-        towhee
-        .glob["path"](str(DATA_DIR / "**/*.png"))
+        towhee.glob["path"](str(DATASET / "**/*.png"))
         .extract_fields["path", ("company", "name", "position")]()
         .image_decode["path", "image"]()
-    ) 
+        .extract_embedding["image", "embedding"]()
+    )
 
     for sample in dataset:
-        print(f"{sample.company:<15}{sample.name:<25}{sample.position}")
-    
+        # print(f"{sample.company:<15}{sample.name:<25}{sample.position:<15}")
+        print(sample.embedding.shape)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
