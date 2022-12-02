@@ -26,22 +26,22 @@ def check_keys(model, pretrained_state_dict):
     used_pretrained_keys = model_keys & ckpt_keys
     unused_pretrained_keys = ckpt_keys - model_keys
     missing_keys = model_keys - ckpt_keys
-    print("Missing keys:{}".format(len(missing_keys)))
-    print("Unused checkpoint keys:{}".format(len(unused_pretrained_keys)))
-    print("Used keys:{}".format(len(used_pretrained_keys)))
+    #  print("Missing keys:{}".format(len(missing_keys)))
+    #  print("Unused checkpoint keys:{}".format(len(unused_pretrained_keys)))
+    #  print("Used keys:{}".format(len(used_pretrained_keys)))
     assert len(used_pretrained_keys) > 0, "load NONE from pretrained checkpoint"
     return True
 
 
 def remove_prefix(state_dict, prefix):
     """Old style model is stored with all names of parameters sharing common prefix 'module.'"""
-    print("remove prefix '{}'".format(prefix))
+    #  print("remove prefix '{}'".format(prefix))
     f = lambda x: x.split(prefix, 1)[-1] if x.startswith(prefix) else x
     return {f(key): value for key, value in state_dict.items()}
 
 
 def load_model(model, pretrained_path, load_to_cpu):
-    print("Loading pretrained model from {}".format(pretrained_path))
+    #  print("Loading pretrained model from {}".format(pretrained_path))
     if load_to_cpu:
         pretrained_dict = torch.load(
             pretrained_path, map_location=lambda storage, loc: storage
@@ -64,26 +64,23 @@ torch.set_grad_enabled(False)
 cfg = None
 cfg = cfg_mnet
 
+
 # net and model
 net = RetinaFace(cfg=cfg, phase="test")
 net = load_model(
     net, pretrained_path="weights/mobilenet0.25_Final.pth", load_to_cpu=True
 )
 net.eval()
-print("Finished loading model!")
-print(net)
+#  print("Finished loading model!")
+#  print(net)
 cudnn.benchmark = False
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net = net.to(device)
 
+
 sess = ort.InferenceSession("weights/webface_r50.onnx")
 input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
-
-
-CONFIDENCE_THRESHOLD = 0.9
-NMS_THRESHOLD = 0.4
-KEEP_TOP_K = 750
 
 
 @towhee.register("extract_embedding")
