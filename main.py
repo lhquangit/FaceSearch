@@ -3,7 +3,6 @@ from pathlib import Path
 
 import towhee
 
-
 DATA_DIR = Path("data/rikai/")
 
 
