@@ -6,7 +6,7 @@ import towhee
 
 import embedding
 
-DATASET = Path("dataset/rikai/")
+DATASET = Path("data/rikai/")
 
 
 @towhee.register("extract_fields")
