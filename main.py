@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from collections import namedtuple
 
 import towhee
 
@@ -11,11 +12,17 @@ DATASET = Path("dataset/rikai/")
 @towhee.register("extract_fields")
 def extract_fields(path: str) -> tuple[str, str, str]:
     dir_name = Path(path).parent.name
-    fields = re.fullmatch(r"(.*) - (.*) - (.*)", dir_name)
-    company = fields.group(1)  # type: ignore
-    name = fields.group(2)  # type: ignore
-    position = fields.group(3)  # type: ignore
-    return company, name, position
+    match_obj = re.fullmatch(r"(.*) - (.*) - (.*)", dir_name)
+
+    field_names = ["company", "name", "position"]
+    fields = namedtuple("fields", field_names)
+
+    return fields(
+        **{
+            field_name: match_obj.group(idx)  # type: ignore
+            for idx, field_name in enumerate(field_names, start=1)
+        }
+    )
 
 
 def main() -> None:
@@ -29,8 +36,8 @@ def main() -> None:
     )
 
     for sample in dataset:
-        # print(f"{sample.company:<15}{sample.name:<25}{sample.position:<15}")
-        print(sample.embedding.shape)
+        print(f"{sample.company:<15}{sample.name:<25}{sample.position:<15}")
+        # print(sample.embedding.shape)
 
 
 if __name__ == "__main__":
