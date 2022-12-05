@@ -19,7 +19,7 @@ def extract_fields(path: str) -> tuple[str, str, str]:
 
     return fields(
         **{
-            field_name: match_obj.group(idx)  # type: ignore
+            field_name: match_obj.group(idx)
             for idx, field_name in enumerate(field_names, start=1)
         }
     )
