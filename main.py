@@ -21,7 +21,8 @@ def extract_fields(path: str) -> tuple[str, str, str]:
 def main() -> None:
 
     dataset = (
-        towhee.glob["path"](str(DATASET / "**/*.png"))
+        towhee
+        .glob["path"](str(DATASET / "**/*.png"))
         .extract_fields["path", ("company", "name", "position")]()
         .image_decode["path", "image"]()
         .extract_embedding["image", "embedding"]()
