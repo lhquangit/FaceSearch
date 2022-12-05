@@ -4,6 +4,6 @@ data/
 venv/
 volumes/
 weights/
-*.ipynb
+*.png
 *.tar.gz
 *.zip
