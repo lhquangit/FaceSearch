@@ -2,13 +2,13 @@ from pathlib import Path
 
 import cv2
 import towhee
+from pymilvus import Collection
 from towhee._types import Image
 
 import embedding
 from connection import create_collection
 
 DATASET = Path("data/rikai/")
-TEST_IMAGE = Path("test_image.png")
 
 
 def read_images(results):
@@ -19,21 +19,13 @@ def read_images(results):
 
 
 def main() -> None:
-    collection = create_collection("face_search", dim=512)
 
-    (
-        towhee
-        .glob["path"](str(DATASET / "**/*.png"))
-        .image_decode["path", "image"]()
-        .extract_embedding["image", "embedding"]()
-        .ann_insert.milvus[("path", "embedding"), "mr"](collection=collection)
-    )
-
+    collection = Collection("face_search")
     collection.load()
 
     (
         towhee
-        .glob["path"](str(TEST_IMAGE))
+        .glob["path"]("test_images/*.png")
         .image_decode["path", "image"]()
         .extract_embedding["image", "embedding"]()
         .ann_search.milvus["embedding", "results"](collection=collection, limit=1)
