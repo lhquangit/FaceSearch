@@ -3,7 +3,6 @@ from pymilvus import (
     Collection,
     CollectionSchema,
     FieldSchema,
-    connections,
     utility,
 )
 
@@ -28,6 +27,3 @@ def create_collection(collection_name: str, dim: int | tuple[int]):
     }
     collection.create_index(field_name="embedding", index_params=index_params)
     return collection
-
-
-connections.connect(host="127.0.0.1", port="19530")
