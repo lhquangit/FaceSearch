@@ -1,5 +1,5 @@
-
 from io import BytesIO
+from pathlib import Path
 
 import cv2
 import towhee
@@ -10,7 +10,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 from fastapi import FastAPI, File
 from pymilvus import Collection, connections
 
-from embedding import predict_face
+from model import predict_face
+
+TEST_DIR = Path("test_images/")
+SAME_PERSON_THRESHOLD = 0.2
 
 
 def read_images(results):
@@ -37,10 +40,10 @@ async def root() -> dict[str, str]:
 async def similar_images(image: bytes = File()) -> dict[str, str]:
     pil_image = Image.open(BytesIO(image))
     pil_image.show()
-    pil_image.save("test_images/test_image.png")
+    pil_image.save(str(TEST_DIR / "test_image.png"))
     results = (
         towhee
-        .glob["path"]("test_images/test_image.png")
+        .glob["path"](str(TEST_DIR / "test_image.png"))
         .image_decode["path", "image"]()
         .extract_embedding["image", "embedding"]()
         .ann_search.milvus["embedding", "results"](collection=collection, limit=1)
@@ -56,12 +59,12 @@ async def similar_images(image: bytes = File()) -> dict[str, str]:
 @app.post("/same_person")
 async def same_person(image_1: bytes = File(), image_2: bytes = File()) -> bool:
     pil_image_1 = Image.open(BytesIO(image_1))
-    pil_image_1.save("test_images/test_image_1.png")
+    pil_image_1.save(str(TEST_DIR / "test_image_1.png"))
     pil_image_2 = Image.open(BytesIO(image_2))
-    pil_image_2.save("test_images/test_image_2.png")
+    pil_image_2.save(TEST_DIR / "test_image_2.png")
     embeddings = (
         towhee
-        .glob["path"]("test_images/test_image_*.png")
+        .glob["path"](TEST_DIR / "test_image_*.png")
         .image_decode["path", "image"]()
         .extract_embedding["image", "embedding"]()
     )
@@ -69,5 +72,5 @@ async def same_person(image_1: bytes = File(), image_2: bytes = File()) -> bool:
         cosine_similarity(
             embeddings[0].embedding.reshape(1, -1), 
             embeddings[1].embedding.reshape(1, -1)
-        ).squeeze() > 0.2
+        ).squeeze() > SAME_PERSON_THRESHOLD
     )
