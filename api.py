@@ -8,21 +8,18 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 from fastapi import FastAPI, File
+from fastapi.responses import FileResponse
 from pymilvus import Collection, connections
 
 from model import predict_face
 
 TEST_DIR = Path("test_images/")
+N_SIMILAR_IMAGES = 1
 SAME_PERSON_THRESHOLD = 0.2
 
 
-def read_images(results):
-    from towhee._types import Image
-
-    return [
-        Image(cv2.imread(result.id), "BGR")
-        for result in results
-    ]
+def read_paths(results):
+    return [result.id for result in results]
 
 
 app = FastAPI()
@@ -37,23 +34,20 @@ async def root() -> dict[str, str]:
 
 
 @app.post("/similar_images")
-async def similar_images(image: bytes = File()) -> dict[str, str]:
+async def similar_images(image: bytes = File()) -> FileResponse:
     pil_image = Image.open(BytesIO(image))
-    pil_image.show()
     pil_image.save(str(TEST_DIR / "test_image.png"))
     results = (
         towhee
         .glob["path"](str(TEST_DIR / "test_image.png"))
         .image_decode["path", "image"]()
         .extract_embedding["image", "embedding"]()
-        .ann_search.milvus["embedding", "results"](collection=collection, limit=1)
-        .runas_op["results", "result_images"](func=read_images)
-        .select["image", "result_images"]()
+        .ann_search.milvus["embedding", "results"](collection=collection, limit=N_SIMILAR_IMAGES)
+        .runas_op["results", "result_paths"](func=read_paths)
+        .select["image", "result_paths"]()
     )
-    similar_images = [result.image for result in results]
-    print(len(similar_images))
-    print(similar_images[0].shape)
-    return {"similar_images": "Hello, World!"}
+    result_paths = [results[0].result_paths[idx] for idx in range(N_SIMILAR_IMAGES)]
+    return [FileResponse(result_path) for result_path in result_paths][0]
 
 
 @app.post("/same_person")
