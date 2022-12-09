@@ -1,6 +1,7 @@
+.idea/
 .ipynb_checkpoints/
 __pycache__/
-data/
+dataset/
 test_images/
 volumes/
 weights/
