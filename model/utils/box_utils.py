@@ -4,7 +4,7 @@ import numpy as np
 
 def point_form(boxes):
     """Convert prior_boxes to (xmin, ymin, xmax, ymax)
-    representation for comparison to point form ground truth data.
+    representation for comparison to point form ground truth dataset.
     Args:
         boxes: (tensor) center-size default boxes from priorbox layers.
     Return:
@@ -21,7 +21,7 @@ def point_form(boxes):
 
 def center_size(boxes):
     """Convert prior_boxes to (cx, cy, w, h)
-    representation for comparison to center-size form ground truth data.
+    representation for comparison to center-size form ground truth dataset.
     Args:
         boxes: (tensor) point_form boxes
     Return:
@@ -86,7 +86,7 @@ def jaccard(box_a, box_b):
 
 def matrix_iou(a, b):
     """
-    return iou of a and b, numpy version for data augenmentation
+    return iou of a and b, numpy version for dataset augenmentation
     """
     lt = np.maximum(a[:, np.newaxis, :2], b[:, :2])
     rb = np.minimum(a[:, np.newaxis, 2:], b[:, 2:])
@@ -99,7 +99,7 @@ def matrix_iou(a, b):
 
 def matrix_iof(a, b):
     """
-    return iof of a and b, numpy version for data augenmentation
+    return iof of a and b, numpy version for dataset augenmentation
     """
     lt = np.maximum(a[:, np.newaxis, :2], b[:, :2])
     rb = np.minimum(a[:, np.newaxis, 2:], b[:, 2:])
