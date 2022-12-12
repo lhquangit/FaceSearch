@@ -83,7 +83,6 @@ input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
 
 
-@towhee.register("extract_embedding")
 def predict_face(img_raw):
 
     img = np.float32(img_raw)
@@ -160,6 +159,11 @@ def predict_face(img_raw):
     emb = sess.run([label_name], {input_name: np.array([face]).astype(np.float32)})[0]
     # return bbox, face_cv, emb
     return emb.squeeze()
+
+
+@towhee.register("extract_embedding")
+def extract_embedding(*args, **kwargs):
+    return predict_face(*args, **kwargs)
 
 
 # folder = "datasets/rikai/"

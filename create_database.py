@@ -14,8 +14,7 @@ def main():
     collection = create_collection("face_search", dim=512)
 
     (
-        towhee
-        .glob["path"](str(DATASET / "**/*.png"))
+        towhee.glob["path"](str(DATASET / "**/*.png"))
         .image_decode["path", "image"]()
         .extract_embedding["image", "embedding"]()
         .ann_insert.milvus[("path", "embedding"), "mr"](collection=collection)
