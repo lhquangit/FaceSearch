@@ -9,7 +9,7 @@ from pymilvus import (
 
 def create_collection(collection_name: str, dim: int | tuple[int]):
     if utility.has_collection(collection_name):
-        utility.drop_collection(collection_name)
+        return Collection(name=collection_name)
 
     fields = [
         FieldSchema(
