@@ -5,9 +5,11 @@ channels:
   - pytorch
 dependencies:
   - conda-forge::python=3.10.8
+  - conda-forge::pip-autoremove=0.10.0
   - conda-forge::jupyterlab=3.5.0
   - conda-forge::ipywidgets=8.0.3
-  - conda-forge::pip-autoremove=0.10.0
+  - conda-forge::fastapi=0.88.0
+  - conda-forge::uvicorn=0.20.0
   - conda-forge::opencv=4.5.5
   - conda-forge::pandas=1.5.2
   - conda-forge::grpcio-tools=1.46.0
