@@ -1,1 +1,1 @@
-from .connection import create_collection
+from .database import create_collection
