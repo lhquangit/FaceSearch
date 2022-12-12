@@ -6,9 +6,10 @@ import towhee
 from PIL import Image
 from fastapi import FastAPI, File
 from fastapi.responses import FileResponse
-from pymilvus import Collection, connections
+from pymilvus import connections
 from sklearn.metrics.pairwise import cosine_similarity
 
+from database import create_collection
 from model import predict_face
 
 TEST_DIR = Path("test_images/")
@@ -17,7 +18,7 @@ SAME_PERSON_THRESHOLD = 0.5
 
 # Establish the database connection
 connections.connect(host="127.0.0.1", port="19530")
-collection = Collection("face_search")
+collection = create_collection("face_search", dim=512)
 collection.load()
 
 app = FastAPI()
@@ -50,25 +51,25 @@ async def similar_image(image: bytes = File()) -> FileResponse:
     print(result_path)
     return FileResponse(result_path)
 
-
-@app.post("/same_person")
-async def same_person(images: tuple[bytes] = (File(), File())) -> bool:
-    pil_images = [
-        Image.open(BytesIO(image)) for image in images
-    ]
-    for idx, pil_image in enumerate(pil_images, start=1):
-        pil_image.save(TEST_DIR / f"test_image_{idx}.png")
-
-    data_collection = (
-        towhee
-        .glob["path"](TEST_DIR / "test_image_*.png")
-        .image_decode["path", "image"]()
-        .extract_embedding["image", "embedding"]()
-    )
-
-    embeddings = [sample.embedding for sample in data_collection]
-    embeddings = [
-        np.expand_dims(embedding, axis=0) for embedding in embeddings
-    ]  # Expand the dimension of embedding for scikit-learn API compatability
-    similarity = cosine_similarity(*[embedding for embedding in embeddings]).squeeze()
-    return bool(similarity > SAME_PERSON_THRESHOLD)
+#
+# @app.post("/same_person")
+# async def same_person(images: tuple[bytes] = (File(), File())) -> bool:
+#     pil_images = [
+#         Image.open(BytesIO(image)) for image in images
+#     ]
+#     for idx, pil_image in enumerate(pil_images, start=1):
+#         pil_image.save(TEST_DIR / f"test_image_{idx}.png")
+#
+#     data_collection = (
+#         towhee
+#         .glob["path"](TEST_DIR / "test_image_*.png")
+#         .image_decode["path", "image"]()
+#         .extract_embedding["image", "embedding"]()
+#     )
+#
+#     embeddings = [sample.embedding for sample in data_collection]
+#     embeddings = [
+#         np.expand_dims(embedding, axis=0) for embedding in embeddings
+#     ]  # Expand the dimension of embedding for scikit-learn API compatability
+#     similarity = cosine_similarity(*[embedding for embedding in embeddings]).squeeze()
+#     return bool(similarity > SAME_PERSON_THRESHOLD)
